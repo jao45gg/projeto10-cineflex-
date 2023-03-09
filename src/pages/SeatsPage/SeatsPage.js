@@ -1,6 +1,10 @@
 import styled from "styled-components"
+import { useParams, Link } from "react-router-dom"
 
 export default function SeatsPage() {
+
+    const {idSessao} = useParams()
+    
 
     return (
         <PageContainer>
