@@ -1,6 +1,10 @@
 import styled from "styled-components"
+import axios from "axios"
+import { useParams, Link } from "react-router-dom"
 
 export default function SessionsPage() {
+
+    const {idFilme} = useParams()
 
     return (
         <PageContainer>

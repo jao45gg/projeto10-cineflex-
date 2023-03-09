@@ -1,26 +1,37 @@
 import styled from "styled-components"
+import axios from "axios"
+import { useEffect, useState } from "react"
+import { Link } from "react-router-dom";
 
 export default function HomePage() {
+
+    const [Filmes, setFilmes] = useState(null);
+
+    useEffect(() => {
+        const promisse = axios.get("https://mock-api.driven.com.br/api/v8/cineflex/movies")
+
+        promisse.then((resposta) => setFilmes(resposta.data))
+        promisse.catch((erro) => console.log(erro))
+    }, [])
+
+    if (Filmes === null) {
+        return (
+            <div>Carregando</div>
+        )
+    }
+
     return (
         <PageContainer>
             Selecione o filme
 
             <ListContainer>
-                <MovieContainer>
-                    <img src={"https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"} alt="poster"/>
-                </MovieContainer>
-
-                <MovieContainer>
-                    <img src={"https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"} alt="poster"/>
-                </MovieContainer>
-
-                <MovieContainer>
-                    <img src={"https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"} alt="poster"/>
-                </MovieContainer>
-
-                <MovieContainer>
-                    <img src={"https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"} alt="poster"/>
-                </MovieContainer>
+                {Filmes.map(f => 
+                    <Link to={`sessoes/${f.id}`}>
+                        <MovieContainer>
+                            <img src={f.posterURL} alt={f.title}/>
+                        </MovieContainer>
+                    </Link>
+                )}
             </ListContainer>
 
         </PageContainer>
@@ -45,6 +56,7 @@ const ListContainer = styled.div`
     flex-direction: row;
     padding: 10px;
 `
+
 const MovieContainer = styled.div`
     width: 145px;
     height: 210px;
@@ -58,4 +70,4 @@ const MovieContainer = styled.div`
         width: 130px;
         height: 190px;
     }
-`
+`;
