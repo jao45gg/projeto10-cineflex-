@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom"
-import {PageContainer2, TextContainer} from "../../style/styles.js"
+import { PageContainer3, TextContainer } from "../../style/styles.js"
 
 export default function SuccessPage({ Assentos, CPF, nome, arrSeats, limpar }) {
 
     return (
-        <PageContainer2>
+        <PageContainer3>
             <h1>Pedido feito <br /> com sucesso!</h1>
 
             <TextContainer data-test="movie-info">
@@ -15,7 +15,7 @@ export default function SuccessPage({ Assentos, CPF, nome, arrSeats, limpar }) {
 
             <TextContainer data-test="seats-info">
                 <strong><p>Ingressos</p></strong>
-                {arrSeats.map((a,index) => <p key={index}>Assento {a.name}</p>)}
+                {arrSeats.map((a, index) => <p key={index}>Assento {a.name}</p>)}
             </TextContainer>
 
             <TextContainer data-test="client-info">
@@ -27,6 +27,6 @@ export default function SuccessPage({ Assentos, CPF, nome, arrSeats, limpar }) {
                 <button>Voltar para Home</button>
             </Link>
 
-        </PageContainer2>
+        </PageContainer3>
     )
 }

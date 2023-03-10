@@ -102,10 +102,10 @@ export default function SeatsPage({ Assentos, setAssentos, CPF, SetCPF, nome, Se
             <FormContainer>
                 <form onSubmit={reservarAssentos}>
                     Nome do Comprador:
-                    <input data-test="client-name" type="text" required placeholder="Digite seu nome..." onChange={e => Setnome(e.target.value)} />
+                    <input data-test="client-name" type="text" value={nome} required placeholder="Digite seu nome..." onChange={e => Setnome(e.target.value)} />
 
                     CPF do Comprador:
-                    <input data-test="client-cpf" type="text" required placeholder="Digite seu CPF..." onChange={e => SetCPF(e.target.value)} />
+                    <input data-test="client-cpf" type="text" value={CPF} required placeholder="Digite seu CPF..." onChange={e => SetCPF(e.target.value)} />
 
                     <button data-test="book-seat-btn" type="submit">Reservar Assento(s)</button>
                 </form>
