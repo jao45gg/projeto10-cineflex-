@@ -49,13 +49,13 @@ export default function SeatsPage({ Assentos, setAssentos, CPF, SetCPF, nome, Se
         for (let index = 0; index < arrSeats.length; index++) {
             newArr.push(arrSeats[index].id)
         }
+        
 
         const promisse = axios.post("https://mock-api.driven.com.br/api/v8/cineflex/seats/book-many", {
             ids: newArr,
             name: nome,
-            CPF: CPF
+            cpf: CPF
         });
-
 
         promisse.then(() => navigate("/sucesso"))
         promisse.catch((e) => console.log(e))
