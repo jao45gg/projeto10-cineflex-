@@ -1,34 +1,89 @@
 import styled from "styled-components"
 import { useParams, Link } from "react-router-dom"
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function SeatsPage() {
 
-    const {idSessao} = useParams()
-    
+    const { idSessao } = useParams()
+
+    const [Assentos, setAssentos] = useState(null);
+    const [arrSeats, setArrSeats] = useState([]);
+
+    useEffect(() => {
+        const promisse = axios.get(`https://mock-api.driven.com.br/api/v8/cineflex/showtimes/${idSessao}/seats`)
+
+        promisse.then((resposta) => setAssentos(resposta.data))
+        promisse.catch((erro) => console.log(erro))
+    }, [idSessao])
+
+    if (Assentos === null) {
+        return (
+            <div>Carregando</div>
+        )
+    }
+
+    function colorSeat(status, id) {
+
+        if (arrSeats.includes(id))
+            return "#1AAE9E"
+
+        if (status)
+            return "#C3CFD9"
+
+        return "#FBE192"
+    }
+
+    function borderColorSeat(status, id) {
+
+        if (arrSeats.includes(id))
+            return "#0E7D71"
+
+        if (status)
+            return "#7B8B99"
+
+        return "#F7C52B"
+    }
 
     return (
         <PageContainer>
             Selecione o(s) assento(s)
 
             <SeatsContainer>
-                <SeatItem>01</SeatItem>
-                <SeatItem>02</SeatItem>
-                <SeatItem>03</SeatItem>
-                <SeatItem>04</SeatItem>
-                <SeatItem>05</SeatItem>
+                {Assentos.seats.map(a =>
+                    <SeatItem color={colorSeat(a.isAvailable, a.id)} borderColor={borderColorSeat(a.isAvailable, a.id)}
+                        onClick={() => {
+                            if (arrSeats.includes(a.id)) {
+
+                                let newArr = [];
+                                for (let index = 0; index < arrSeats.length; index++) {
+
+                                    if (arrSeats[index] !== a.id)
+                                        newArr.push(arrSeats[index])
+
+                                }
+
+                                setArrSeats(newArr);
+
+                            } else if (a.isAvailable) {
+                                setArrSeats([...arrSeats, a.id])
+                            } else
+                                alert("Esse assento não está disponível");
+                        }}>{a.name}</SeatItem>
+                )}
             </SeatsContainer>
 
             <CaptionContainer>
                 <CaptionItem>
-                    <CaptionCircle />
+                    <CaptionCircle color="#1AAE9E" borderColor="#0E7D71" />
                     Selecionado
                 </CaptionItem>
                 <CaptionItem>
-                    <CaptionCircle />
+                    <CaptionCircle color="#C3CFD9" borderColor="#7B8B99" />
                     Disponível
                 </CaptionItem>
                 <CaptionItem>
-                    <CaptionCircle />
+                    <CaptionCircle color="#FBE192" borderColor="#F7C52B" />
                     Indisponível
                 </CaptionItem>
             </CaptionContainer>
@@ -45,15 +100,15 @@ export default function SeatsPage() {
 
             <FooterContainer>
                 <div>
-                    <img src={"https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"} alt="poster" />
+                    <img src={Assentos.movie.posterURL} alt={Assentos.movie.title} />
                 </div>
                 <div>
-                    <p>Tudo em todo lugar ao mesmo tempo</p>
-                    <p>Sexta - 14h00</p>
+                    <p>{Assentos.movie.title}</p>
+                    <p>{`${Assentos.day.weekday} - ${Assentos.name}`}</p>
                 </div>
             </FooterContainer>
 
-        </PageContainer>
+        </PageContainer >
     )
 }
 
@@ -100,8 +155,8 @@ const CaptionContainer = styled.div`
     margin: 20px;
 `
 const CaptionCircle = styled.div`
-    border: 1px solid blue;         // Essa cor deve mudar
-    background-color: lightblue;    // Essa cor deve mudar
+    border: 1px solid ${props => props.borderColor};         // Essa cor deve mudar
+    background-color: ${props => props.color};    // Essa cor deve mudar
     height: 25px;
     width: 25px;
     border-radius: 25px;
@@ -117,8 +172,8 @@ const CaptionItem = styled.div`
     font-size: 12px;
 `
 const SeatItem = styled.div`
-    border: 1px solid blue;         // Essa cor deve mudar
-    background-color: lightblue;    // Essa cor deve mudar
+    border: 1px solid ${props => props.borderColor};         // Essa cor deve mudar
+    background-color: ${props => props.color};    // Essa cor deve mudar
     height: 25px;
     width: 25px;
     border-radius: 25px;

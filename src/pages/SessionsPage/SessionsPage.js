@@ -11,9 +11,9 @@ export default function SessionsPage() {
     useEffect(() => {
         const promisse = axios.get(`https://mock-api.driven.com.br/api/v8/cineflex/movies/${idFilme}/showtimes`)
 
-        promisse.then((resposta) => { setSecoes(resposta.data); console.log(resposta.data) })
+        promisse.then((resposta) => setSecoes(resposta.data))
         promisse.catch((erro) => console.log(erro))
-    }, [])
+    }, [idFilme])
 
     if (Secoes === null) {
         return (
