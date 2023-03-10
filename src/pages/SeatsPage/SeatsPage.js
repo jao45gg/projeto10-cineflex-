@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { useParams, Link } from "react-router-dom"
+import { useParams, Link, useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -9,6 +9,9 @@ export default function SeatsPage() {
 
     const [Assentos, setAssentos] = useState(null);
     const [arrSeats, setArrSeats] = useState([]);
+    const [CPF,SetCPF] = useState("");
+    const [nome,Setnome] = useState("");
+    const navigate = useNavigate();
 
     useEffect(() => {
         const promisse = axios.get(`https://mock-api.driven.com.br/api/v8/cineflex/showtimes/${idSessao}/seats`)
@@ -43,6 +46,19 @@ export default function SeatsPage() {
             return "#7B8B99"
 
         return "#F7C52B"
+    }
+
+    function reservarAssentos(e) {
+        e.preventDefault();
+
+        const promisse = axios.post("https://mock-api.driven.com.br/api/v8/cineflex/seats/book-many", {
+            ids: arrSeats,
+            name: nome,
+            CPF: CPF
+        });
+        
+        promisse.then(() => navigate("/sucesso"))
+        promisse.catch((e) => console.log(e))
     }
 
     return (
@@ -89,13 +105,15 @@ export default function SeatsPage() {
             </CaptionContainer>
 
             <FormContainer>
-                Nome do Comprador:
-                <input placeholder="Digite seu nome..." />
+                <form onSubmit={reservarAssentos}>
+                    Nome do Comprador:
+                    <input type="text" required placeholder="Digite seu nome..." value={nome} onChange={e => Setnome(e.target.value)}/>
 
-                CPF do Comprador:
-                <input placeholder="Digite seu CPF..." />
+                    CPF do Comprador:
+                    <input type="text" required placeholder="Digite seu CPF..." value={CPF} onChange={e => SetCPF(e.target.value)}/>
 
-                <button>Reservar Assento(s)</button>
+                    <button type="submit">Reservar Assento(s)</button>
+                </form>
             </FormContainer>
 
             <FooterContainer>
