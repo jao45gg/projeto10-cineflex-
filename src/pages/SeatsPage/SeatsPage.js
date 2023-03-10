@@ -1,16 +1,12 @@
 import styled from "styled-components"
-import { useParams, Link, useNavigate } from "react-router-dom"
-import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom"
+import { useEffect } from "react";
 import axios from "axios";
+import { PageContainer2, SeatsContainer, FormContainer, CaptionContainer, CaptionItem, FooterContainer1 } from "../../style/styles";
 
-export default function SeatsPage() {
+export default function SeatsPage({ Assentos, setAssentos, CPF, SetCPF, nome, Setnome, arrSeats, setArrSeats }) {
 
     const { idSessao } = useParams()
-
-    const [Assentos, setAssentos] = useState(null);
-    const [arrSeats, setArrSeats] = useState([]);
-    const [CPF,SetCPF] = useState("");
-    const [nome,Setnome] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -18,7 +14,7 @@ export default function SeatsPage() {
 
         promisse.then((resposta) => setAssentos(resposta.data))
         promisse.catch((erro) => console.log(erro))
-    }, [idSessao])
+    }, [idSessao, setAssentos])
 
     if (Assentos === null) {
         return (
@@ -26,9 +22,8 @@ export default function SeatsPage() {
         )
     }
 
-    function colorSeat(status, id) {
-
-        if (arrSeats.includes(id))
+    function colorSeat(status, a) {
+        if (arrSeats.includes(a))
             return "#1AAE9E"
 
         if (status)
@@ -37,9 +32,8 @@ export default function SeatsPage() {
         return "#FBE192"
     }
 
-    function borderColorSeat(status, id) {
-
-        if (arrSeats.includes(id))
+    function borderColorSeat(status, a) {
+        if (arrSeats.includes(a))
             return "#0E7D71"
 
         if (status)
@@ -51,41 +45,42 @@ export default function SeatsPage() {
     function reservarAssentos(e) {
         e.preventDefault();
 
+        let newArr = [];
+        for (let index = 0; index < arrSeats.length; index++) {
+            newArr.push(arrSeats[index].id)
+        }
+
         const promisse = axios.post("https://mock-api.driven.com.br/api/v8/cineflex/seats/book-many", {
-            ids: arrSeats,
+            ids: newArr,
             name: nome,
             CPF: CPF
         });
-        
+
+
         promisse.then(() => navigate("/sucesso"))
         promisse.catch((e) => console.log(e))
     }
 
     return (
-        <PageContainer>
+        <PageContainer2>
             Selecione o(s) assento(s)
 
             <SeatsContainer>
-                {Assentos.seats.map(a =>
-                    <SeatItem color={colorSeat(a.isAvailable, a.id)} borderColor={borderColorSeat(a.isAvailable, a.id)}
+                {Assentos.seats.map((a, index) =>
+                    <SeatItem key={index} color={colorSeat(a.isAvailable, a)} borderColor={borderColorSeat(a.isAvailable, a)}
                         onClick={() => {
-                            if (arrSeats.includes(a.id)) {
-
+                            if (arrSeats.includes(a)) {
                                 let newArr = [];
                                 for (let index = 0; index < arrSeats.length; index++) {
-
-                                    if (arrSeats[index] !== a.id)
+                                    if (arrSeats[index] !== a)
                                         newArr.push(arrSeats[index])
-
                                 }
-
                                 setArrSeats(newArr);
-
                             } else if (a.isAvailable) {
-                                setArrSeats([...arrSeats, a.id])
+                                setArrSeats([...arrSeats, a])
                             } else
                                 alert("Esse assento não está disponível");
-                        }}>{a.name}</SeatItem>
+                        }} data-test="seat">{a.name}</SeatItem>
                 )}
             </SeatsContainer>
 
@@ -107,16 +102,16 @@ export default function SeatsPage() {
             <FormContainer>
                 <form onSubmit={reservarAssentos}>
                     Nome do Comprador:
-                    <input type="text" required placeholder="Digite seu nome..." value={nome} onChange={e => Setnome(e.target.value)}/>
+                    <input data-test="client-name" type="text" required placeholder="Digite seu nome..." onChange={e => Setnome(e.target.value)} />
 
                     CPF do Comprador:
-                    <input type="text" required placeholder="Digite seu CPF..." value={CPF} onChange={e => SetCPF(e.target.value)}/>
+                    <input data-test="client-cpf" type="text" required placeholder="Digite seu CPF..." onChange={e => SetCPF(e.target.value)} />
 
-                    <button type="submit">Reservar Assento(s)</button>
+                    <button data-test="book-seat-btn" type="submit">Reservar Assento(s)</button>
                 </form>
             </FormContainer>
 
-            <FooterContainer>
+            <FooterContainer1 data-test="footer">
                 <div>
                     <img src={Assentos.movie.posterURL} alt={Assentos.movie.title} />
                 </div>
@@ -124,54 +119,12 @@ export default function SeatsPage() {
                     <p>{Assentos.movie.title}</p>
                     <p>{`${Assentos.day.weekday} - ${Assentos.name}`}</p>
                 </div>
-            </FooterContainer>
+            </FooterContainer1>
 
-        </PageContainer >
+        </PageContainer2 >
     )
 }
 
-const PageContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-family: 'Roboto';
-    font-size: 24px;
-    text-align: center;
-    color: #293845;
-    margin-top: 30px;
-    padding-bottom: 120px;
-    padding-top: 70px;
-`
-const SeatsContainer = styled.div`
-    width: 330px;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    margin-top: 20px;
-`
-const FormContainer = styled.div`
-    width: calc(100vw - 40px); 
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin: 20px 0;
-    font-size: 18px;
-    button {
-        align-self: center;
-    }
-    input {
-        width: calc(100vw - 60px);
-    }
-`
-const CaptionContainer = styled.div`
-    display: flex;
-    flex-direction: row;
-    width: 300px;
-    justify-content: space-between;
-    margin: 20px;
-`
 const CaptionCircle = styled.div`
     border: 1px solid ${props => props.borderColor};         // Essa cor deve mudar
     background-color: ${props => props.color};    // Essa cor deve mudar
@@ -183,12 +136,7 @@ const CaptionCircle = styled.div`
     justify-content: center;
     margin: 5px 3px;
 `
-const CaptionItem = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 12px;
-`
+
 const SeatItem = styled.div`
     border: 1px solid ${props => props.borderColor};         // Essa cor deve mudar
     background-color: ${props => props.color};    // Essa cor deve mudar
@@ -201,42 +149,4 @@ const SeatItem = styled.div`
     align-items: center;
     justify-content: center;
     margin: 5px 3px;
-`
-const FooterContainer = styled.div`
-    width: 100%;
-    height: 120px;
-    background-color: #C3CFD9;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    font-size: 20px;
-    position: fixed;
-    bottom: 0;
-
-    div:nth-child(1) {
-        box-shadow: 0px 2px 4px 2px #0000001A;
-        border-radius: 3px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: white;
-        margin: 12px;
-        img {
-            width: 50px;
-            height: 70px;
-            padding: 8px;
-        }
-    }
-
-    div:nth-child(2) {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        p {
-            text-align: left;
-            &:nth-child(2) {
-                margin-top: 10px;
-            }
-        }
-    }
 `
